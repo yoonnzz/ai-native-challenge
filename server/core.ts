@@ -1,3 +1,4 @@
+import {createHash} from 'node:crypto';
 export type Product = {sku:number;name:string;option:string;price:number;stock:number};
 export type Customer = {id:number;name:string};
 export type CartLine = {sku:number;qty:number;selected:boolean};
@@ -27,11 +28,13 @@ export function quote(s:ShopState,customerId:number,addressId:number,memo:string
  if(coupon&&subtotal<30000)fail('쿠폰은 상품 금액 30,000원 이상에 사용할 수 있습니다.');
  const discount=coupon?3000:0,shipping=subtotal>=30000?0:3000;
  if(discount){let allocated=0;for(const item of [...items].sort((a,b)=>a.sku-b.sku)){item.discount=Math.floor(discount*item.price*item.qty/subtotal);allocated+=item.discount;}for(const item of [...items].sort((a,b)=>a.sku-b.sku)){if(allocated===discount)break;item.discount++;allocated++;}}
- return {items,address:structuredClone(address),memo:String(memo??''),subtotal,discount,shipping,total:subtotal-discount+shipping,coupon};
+ const confirmation={items,address:structuredClone(address),memo:String(memo??''),subtotal,discount,shipping,total:subtotal-discount+shipping,coupon};
+ const confirmationKey=createHash('sha256').update(JSON.stringify([customerId,confirmation])).digest('hex');
+ return {...confirmation,confirmationKey};
 }
 function addCart(s:ShopState,u:CustomerState,sku:number,qty:number){if(!integer(qty,1,99))fail('수량은 1~99개여야 합니다.');const p=getProduct(s,sku),line=u.cart.find(l=>l.sku===sku),next=(line?.qty??0)+qty;if(next>99)fail('한 옵션은 최대 99개까지 담을 수 있습니다.');if(p.stock<next)fail(`현재 재고는 ${p.stock}개입니다.`);if(line)line.qty=next;else u.cart.push({sku,qty:next,selected:true});}
 function validAddress(input:any):Omit<Address,'id'|'isDefault'>{const label=String(input.label??'').trim(),recipient=String(input.recipient??'').trim(),phone=String(input.phone??'').replace(/[\s-]/g,''),street=String(input.street??'').trim(),detail=String(input.detail??'').trim();if(!label||!recipient||!street)fail('별칭, 받는 사람, 주소는 필수입니다.');if(!/^\d{10,11}$/.test(phone))fail('연락처는 숫자 10~11자리여야 합니다.');return {label,recipient,phone,street,detail};}
-export type Action = {type:string;customerId:number;sku?:number;qty?:number;selected?:boolean;addressId?:number;orderId?:number;label?:string;recipient?:string;phone?:string;street?:string;detail?:string;memo?:string;coupon?:string};
+export type Action = {type:string;customerId:number;sku?:number;qty?:number;selected?:boolean;addressId?:number;orderId?:number;label?:string;recipient?:string;phone?:string;street?:string;detail?:string;memo?:string;coupon?:string;confirmationKey?:string};
 export function apply(s:ShopState,a:Action){const u=getUser(s,a.customerId),sku=Number(a.sku),qty=Number(a.qty),addressId=Number(a.addressId),orderId=Number(a.orderId);let message='처리했습니다.';
  switch(a.type){
  case 'favorite.toggle':{getProduct(s,sku);u.favorites=u.favorites.includes(sku)?u.favorites.filter(x=>x!==sku):[sku,...u.favorites];break;}
@@ -48,7 +51,7 @@ export function apply(s:ShopState,a:Action){const u=getUser(s,a.customerId),sku=
  case 'address.save':{const v=validAddress(a),existing=u.addresses.find(x=>x.id===addressId);if(a.addressId&&!existing)fail('배송지를 찾을 수 없습니다.');if(existing)Object.assign(existing,v);else u.addresses.push({...v,id:s.nextAddressId++,isDefault:u.addresses.length===0});break;}
  case 'address.delete':{if(!u.addresses.some(x=>x.id===addressId))fail('배송지를 찾을 수 없습니다.');u.addresses=u.addresses.filter(x=>x.id!==addressId);if(u.addresses.length&&!u.addresses.some(x=>x.isDefault))u.addresses[0].isDefault=true;break;}
  case 'address.default':{if(!u.addresses.some(x=>x.id===addressId))fail('배송지를 찾을 수 없습니다.');u.addresses.forEach(x=>x.isDefault=x.id===addressId);break;}
- case 'order.place':{const q=quote(s,a.customerId,addressId,String(a.memo??''),String(a.coupon??''));for(const i of q.items)getProduct(s,i.sku).stock-=i.qty;const order:Order={id:s.nextOrderId++,customerId:a.customerId,createdAt:new Date().toISOString(),...q};u.orders.unshift(order);u.cart=u.cart.filter(l=>!l.selected);if(q.coupon)u.couponUsed=true;message=`주문 #${order.id}이 확정되었습니다.`;return {message,orderId:order.id};}
+ case 'order.place':{const {confirmationKey,...q}=quote(s,a.customerId,addressId,String(a.memo??''),String(a.coupon??''));if(a.confirmationKey!==confirmationKey)fail('주문 내용이 변경되었습니다. 다시 확인하세요.');for(const i of q.items)getProduct(s,i.sku).stock-=i.qty;const order:Order={id:s.nextOrderId++,customerId:a.customerId,createdAt:new Date().toISOString(),...q};u.orders.unshift(order);u.cart=u.cart.filter(l=>!l.selected);if(q.coupon)u.couponUsed=true;message=`주문 #${order.id}이 확정되었습니다.`;return {message,orderId:order.id};}
  case 'order.cancelItem':{const o=getOrder(u,orderId),i=o.items.find(x=>x.sku===sku)??fail('주문 상품을 찾을 수 없습니다.');if(!integer(qty,1,i.qty-i.canceled))fail('취소 가능한 수량을 확인하세요.');i.canceled+=qty;getProduct(s,sku).stock+=qty;if(status(o)==='전체 취소'&&o.coupon)u.couponUsed=false;message=`${qty}개를 취소했습니다.`;break;}
  case 'order.cancelAll':{const o=getOrder(u,orderId);if(status(o)==='전체 취소')fail('이미 전체 취소한 주문입니다.');for(const i of o.items){const remaining=i.qty-i.canceled;i.canceled=i.qty;getProduct(s,i.sku).stock+=remaining;}if(o.coupon)u.couponUsed=false;message='남은 상품을 모두 취소했습니다.';break;}
  case 'order.readd':{const o=getOrder(u,orderId);for(const i of o.items){const p=getProduct(s,i.sku),next=(u.cart.find(l=>l.sku===i.sku)?.qty??0)+i.qty;if(next>99||next>p.stock)fail(`${p.name} ${p.option}: 다시 담을 수 없습니다. 재고 ${p.stock}개, 합산 ${next}개.`);}for(const i of o.items)addCart(s,u,i.sku,i.qty);message='원래 주문 수량을 장바구니에 담았습니다.';break;}
