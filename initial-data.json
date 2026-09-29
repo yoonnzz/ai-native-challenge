@@ -1,0 +1,235 @@
+{
+  "notice": "금액 단위는 원입니다. 상품 금액 30,000원 이상은 무료 배송, 미만은 배송비 3,000원입니다. 무료 배송 기준은 쿠폰 할인 전 상품 금액입니다.",
+  "customers": [
+    {
+      "id": 1,
+      "name": "김가온"
+    },
+    {
+      "id": 2,
+      "name": "이누리"
+    },
+    {
+      "id": 3,
+      "name": "박다온"
+    },
+    {
+      "id": 4,
+      "name": "최라온"
+    }
+  ],
+  "products": [
+    {
+      "sku": 1,
+      "name": "데일리 티셔츠",
+      "option": "검정 / M",
+      "price": 19000,
+      "stock": 3
+    },
+    {
+      "sku": 2,
+      "name": "데일리 티셔츠",
+      "option": "흰색 / M",
+      "price": 19000,
+      "stock": 2
+    },
+    {
+      "sku": 3,
+      "name": "캔버스백",
+      "option": "내추럴",
+      "price": 12000,
+      "stock": 4
+    },
+    {
+      "sku": 4,
+      "name": "머그컵",
+      "option": "코랄",
+      "price": 9000,
+      "stock": 1
+    },
+    {
+      "sku": 5,
+      "name": "머그컵",
+      "option": "크림",
+      "price": 9000,
+      "stock": 0
+    },
+    {
+      "sku": 6,
+      "name": "데일리 티셔츠",
+      "option": "검정 / L",
+      "price": 19000,
+      "stock": 12
+    },
+    {
+      "sku": 7,
+      "name": "캔버스백",
+      "option": "검정",
+      "price": 12000,
+      "stock": 7
+    },
+    {
+      "sku": 8,
+      "name": "캔버스백",
+      "option": "네이비",
+      "price": 14000,
+      "stock": 18
+    },
+    {
+      "sku": 9,
+      "name": "머그컵",
+      "option": "화이트",
+      "price": 9000,
+      "stock": 16
+    },
+    {
+      "sku": 10,
+      "name": "볼캡",
+      "option": "검정",
+      "price": 18000,
+      "stock": 9
+    },
+    {
+      "sku": 11,
+      "name": "볼캡",
+      "option": "베이지",
+      "price": 18000,
+      "stock": 5
+    },
+    {
+      "sku": 12,
+      "name": "볼캡",
+      "option": "네이비",
+      "price": 18000,
+      "stock": 0
+    },
+    {
+      "sku": 13,
+      "name": "데일리 양말",
+      "option": "화이트 / 3켤레",
+      "price": 6000,
+      "stock": 35
+    },
+    {
+      "sku": 14,
+      "name": "데일리 양말",
+      "option": "검정 / 3켤레",
+      "price": 6000,
+      "stock": 22
+    },
+    {
+      "sku": 15,
+      "name": "데일리 양말",
+      "option": "혼합 / 5켤레",
+      "price": 9500,
+      "stock": 11
+    },
+    {
+      "sku": 16,
+      "name": "노트",
+      "option": "무지 / A5",
+      "price": 5000,
+      "stock": 40
+    },
+    {
+      "sku": 17,
+      "name": "노트",
+      "option": "줄 / A5",
+      "price": 5000,
+      "stock": 26
+    },
+    {
+      "sku": 18,
+      "name": "노트",
+      "option": "격자 / B5",
+      "price": 7500,
+      "stock": 8
+    },
+    {
+      "sku": 19,
+      "name": "지퍼 파우치",
+      "option": "올리브 / S",
+      "price": 11000,
+      "stock": 13
+    },
+    {
+      "sku": 20,
+      "name": "지퍼 파우치",
+      "option": "크림 / S",
+      "price": 11000,
+      "stock": 0
+    },
+    {
+      "sku": 21,
+      "name": "지퍼 파우치",
+      "option": "검정 / M",
+      "price": 15000,
+      "stock": 6
+    },
+    {
+      "sku": 22,
+      "name": "텀블러",
+      "option": "실버 / 350ml",
+      "price": 24000,
+      "stock": 10
+    },
+    {
+      "sku": 23,
+      "name": "텀블러",
+      "option": "검정 / 500ml",
+      "price": 29000,
+      "stock": 4
+    },
+    {
+      "sku": 24,
+      "name": "텀블러",
+      "option": "화이트 / 500ml",
+      "price": 29000,
+      "stock": 15
+    },
+    {
+      "sku": 25,
+      "name": "접이식 우산",
+      "option": "검정",
+      "price": 16000,
+      "stock": 2
+    },
+    {
+      "sku": 26,
+      "name": "접이식 우산",
+      "option": "노랑",
+      "price": 16000,
+      "stock": 19
+    },
+    {
+      "sku": 27,
+      "name": "노트북 거치대",
+      "option": "실버",
+      "price": 30000,
+      "stock": 5
+    },
+    {
+      "sku": 28,
+      "name": "노트북 거치대",
+      "option": "검정",
+      "price": 30000,
+      "stock": 0
+    },
+    {
+      "sku": 29,
+      "name": "책상 조명",
+      "option": "화이트",
+      "price": 39000,
+      "stock": 8
+    },
+    {
+      "sku": 30,
+      "name": "책상 조명",
+      "option": "블랙",
+      "price": 42000,
+      "stock": 3
+    }
+  ],
+  "carts": [],
+  "orders": []
+}
