@@ -17,7 +17,7 @@
 {"customerId":1,"addressId":1,"memo":"문 앞","coupon":"WELCOME3000"}
 ```
 
-응답에는 `items`, `address`, `memo`, `subtotal`, `discount`, `shipping`, `total`, `coupon`이 들어갑니다. 배송비는 쿠폰 할인 전 상품 금액이 30,000원 이상이면 0원, 미만이면 3,000원입니다. 쿠폰은 기준 충족 시 3,000원 할인입니다.
+응답에는 `items`, `address`, `memo`, `subtotal`, `discount`, `shipping`, `total`, `coupon`, `confirmationKey`가 들어갑니다. 배송비는 쿠폰 할인 전 상품 금액이 30,000원 이상이면 0원, 미만이면 3,000원입니다. 쿠폰은 기준 충족 시 3,000원 할인입니다. 상품·수량·배송 정보가 바뀌면 `/api/quote`를 다시 호출해야 합니다.
 
 ## 변경
 
@@ -39,7 +39,7 @@
 | `address.save` | `label`, `recipient`, `phone`, `street`, `detail`, 선택적 `addressId` | 배송지 추가·수정. 첫 등록은 기본 배송지. `addressId`가 있으면 수정 |
 | `address.delete` | `addressId` | 배송지 삭제. 기본 배송지 삭제 시 첫 배송지를 기본으로 지정 |
 | `address.default` | `addressId` | 기본 배송지 지정 |
-| `order.place` | `addressId`, `memo`, `coupon` | 선택한 상품만 주문 확정. 재고·쿠폰 재검사 후 재고 차감, 쿠폰 사용 및 장바구니 선택 줄 삭제를 한 번에 처리 |
+| `order.place` | `addressId`, `memo`, `coupon`, `confirmationKey` | 직전 확인 내용과 현재 주문 내용이 일치할 때만 확정. 재고·쿠폰 재검사 후 재고 차감, 쿠폰 사용 및 장바구니 선택 줄 삭제를 한 번에 처리 |
 | `order.cancelItem` | `orderId`, `sku`, `qty` | 해당 주문 옵션의 남은 수량 일부 취소, 재고 복구 |
 | `order.cancelAll` | `orderId` | 해당 주문에서 아직 취소하지 않은 수량 전부 취소, 주문 기록 보존 |
 | `order.readd` | `orderId` | 최초 주문 수량을 현재 장바구니에 다시 담음. 재고 부족이나 99개 초과 시 전체 거절 |
@@ -47,7 +47,7 @@
 주문 예시:
 
 ```json
-{"type":"order.place","customerId":1,"addressId":1,"memo":"문 앞","coupon":"WELCOME3000"}
+{"type":"order.place","customerId":1,"addressId":1,"memo":"문 앞","coupon":"WELCOME3000","confirmationKey":"/api/quote 응답의 confirmationKey"}
 ```
 
 취소 예시:
